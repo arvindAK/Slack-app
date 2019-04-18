@@ -29,6 +29,10 @@ export default class Login extends React.Component {
     this.setState({ [event.target.name]: event.target.value });
   };
 
+  changeChannel = channel => {
+    // this.props.setCurrentChannel(channel);
+  };
+
   handleSubmit = event => {
     event.preventDefault();
     if (this.isFormValid(this.state)) {
@@ -36,10 +40,6 @@ export default class Login extends React.Component {
       firebase
         .auth()
         .signInWithEmailAndPassword(this.state.email, this.state.password)
-        .then(signedInUser => {
-          this.setState({ loading: false });
-          console.log(signedInUser);
-        })
         .catch(err => {
           console.error(err);
           this.setState({

@@ -81,7 +81,6 @@ export default class Register extends React.Component {
         .auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
         .then(createdUser => {
-          console.log(createdUser);
           createdUser.user
             .updateProfile({
               displayName: this.state.username,
@@ -90,12 +89,7 @@ export default class Register extends React.Component {
               )}?d=identicon`
             })
             .then(() => {
-              this.saveUser(createdUser).then(() => {
-                console.log("user saved");
-              });
-            })
-            .then(() => {
-              this.setState({ loading: false });
+              this.saveUser(createdUser).then(() => {});
             })
             .catch(err => {
               console.error(err);
