@@ -4,6 +4,8 @@ import uuidv4 from "uuid/v4";
 import { Segment, Button, Input } from "semantic-ui-react";
 import FileModal from "./FileModal";
 import ProgressBar from "./ProgressBar";
+import { Picker, emojiIndex } from "emoji-mart";
+import "emoji-mart/css/emoji-mart.css";
 
 class MessageForm extends React.Component {
   state = {
@@ -17,7 +19,8 @@ class MessageForm extends React.Component {
     user: this.props.user,
     loading: false,
     errors: [],
-    modal: false
+    modal: false,
+    emojiPicker: false
   };
 
   toggleModal = () => this.setState({ modal: !this.state.modal });
@@ -26,7 +29,10 @@ class MessageForm extends React.Component {
     this.setState({ [event.target.name]: event.target.value });
   };
 
-  handleKeyDown = () => {
+  handleKeyDown = event => {
+    if (event.keyCode === 13) {
+      this.sendMessage();
+    }
     const { message } = this.state;
 
     if (message) {
@@ -34,6 +40,32 @@ class MessageForm extends React.Component {
     } else {
       this.removeTypingRef();
     }
+  };
+
+  handleTogglePicker = () => {
+    this.setState({ emojiPicker: !this.state.emojiPicker });
+  };
+
+  handleAddemoji = emoji => {
+    const oldMessage = this.state.message;
+    const newMessage = this.colonToUnicode(`${oldMessage} ${emoji.colons}`);
+    this.setState({ message: newMessage, emojiPicker: false });
+    setTimeout(() => this.messageInputRef.focus(), 0);
+  };
+
+  colonToUnicode = message => {
+    return message.replace(/:[A-Za-z0-9_+-]+:/g, x => {
+      x = x.replace(/:/g, "");
+      let emoji = emojiIndex.emojis[x];
+      if (typeof emoji !== "undefined") {
+        let unicode = emoji.native;
+        if (typeof unicode !== "undefined") {
+          return unicode;
+        }
+      }
+      x = ":" + x + ":";
+      return x;
+    });
   };
 
   removeTypingRef = () => {
@@ -179,10 +211,20 @@ class MessageForm extends React.Component {
       loading,
       modal,
       percentUploaded,
-      uploadState
+      uploadState,
+      emojiPicker
     } = this.state;
     return (
       <Segment className="message__form">
+        {emojiPicker && (
+          <Picker
+            set="apple"
+            className="emojipicker"
+            title="Pick your emoji"
+            emoji="point_up"
+            onSelect={this.handleAddemoji}
+          />
+        )}
         <Input
           fluid
           name="message"
@@ -190,7 +232,14 @@ class MessageForm extends React.Component {
           onChange={this.handleChange}
           onKeyDown={this.handleKeyDown}
           style={{ marginBottom: "0.7em" }}
-          label={<Button icon={"add"} />}
+          ref={node => (this.messageInputRef = node)}
+          label={
+            <Button
+              icon={emojiPicker ? "close" : "add"}
+              content={emojiPicker ? "Close" : null}
+              onClick={this.handleTogglePicker}
+            />
+          }
           labelPosition="left"
           placeholder="Write your message"
           className={

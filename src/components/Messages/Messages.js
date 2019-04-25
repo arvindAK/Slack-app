@@ -7,6 +7,7 @@ import Message from "./Message";
 import { connect } from "react-redux";
 import { setUserPosts } from "../../actions";
 import Typing from "./Typing";
+import Skeleton from "./Skeleton";
 
 class Messages extends React.Component {
   state = {
@@ -36,6 +37,16 @@ class Messages extends React.Component {
       this.addUserStarsListener(channel.id, user.uid);
     }
   }
+
+  componentDidUpdate(prevProps, preState) {
+    if (this.messagesEnd) {
+      this.scrollToBottom();
+    }
+  }
+
+  scrollToBottom = () => {
+    this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+  };
 
   addListeners = channelId => {
     this.addMessageListener(channelId);
@@ -238,6 +249,15 @@ class Messages extends React.Component {
       </div>
     ));
 
+  displayMessageSkeleton = loading =>
+    loading ? (
+      <React.Fragment>
+        {[...Array(10)].map((_, i) => (
+          <Skeleton key={i} />
+        ))}
+      </React.Fragment>
+    ) : null;
+
   render() {
     const {
       messagesRef,
@@ -250,7 +270,8 @@ class Messages extends React.Component {
       searchLoading,
       privateChannel,
       isChannelStarred,
-      typingUsers
+      typingUsers,
+      messagesLoading
     } = this.state;
     return (
       <React.Fragment>
@@ -266,12 +287,12 @@ class Messages extends React.Component {
 
         <Segment>
           <Comment.Group className="messages">
+            {this.displayMessageSkeleton(messagesLoading)}
             {searchTerm
               ? this.displayMessages(searchResults)
               : this.displayMessages(messages)}
-            <div style={{ display: "flex", alignItems: "center" }}>
-              {this.displayTypingUsers(typingUsers)}
-            </div>
+            {this.displayTypingUsers(typingUsers)}
+            <div ref={node => (this.messagesEnd = node)} />
           </Comment.Group>
         </Segment>
 
