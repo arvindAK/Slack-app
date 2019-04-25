@@ -8,6 +8,7 @@ import ProgressBar from "./ProgressBar";
 class MessageForm extends React.Component {
   state = {
     storageRef: firebase.storage().ref(),
+    typingRef: firebase.database().ref("typing"),
     uploadTask: null,
     uploadState: "",
     percentUploaded: 0,
@@ -23,6 +24,32 @@ class MessageForm extends React.Component {
 
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
+  };
+
+  handleKeyDown = () => {
+    const { message } = this.state;
+
+    if (message) {
+      this.addTypingRef();
+    } else {
+      this.removeTypingRef();
+    }
+  };
+
+  removeTypingRef = () => {
+    const { typingRef, channel, user } = this.state;
+    typingRef
+      .child(channel.id)
+      .child(user.uid)
+      .remove();
+  };
+
+  addTypingRef = () => {
+    const { typingRef, channel, user } = this.state;
+    typingRef
+      .child(channel.id)
+      .child(user.uid)
+      .set(user.displayName);
   };
 
   createMessage = (fileUrl = null) => {
@@ -60,6 +87,7 @@ class MessageForm extends React.Component {
             message: "",
             errors: []
           });
+          this.removeTypingRef();
         })
         .catch(err => {
           console.error(err);
@@ -160,6 +188,7 @@ class MessageForm extends React.Component {
           name="message"
           value={message}
           onChange={this.handleChange}
+          onKeyDown={this.handleKeyDown}
           style={{ marginBottom: "0.7em" }}
           label={<Button icon={"add"} />}
           labelPosition="left"
