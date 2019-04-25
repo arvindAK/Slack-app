@@ -25,7 +25,7 @@ class Messages extends React.Component {
     searchResults: [],
     isChannelStarred: false,
     typingUsers: [],
-    connectedRef: firebase.database().ref("info/connected")
+    connectedRef: firebase.database().ref(".info/connected")
   };
 
   componentDidMount() {
@@ -42,7 +42,7 @@ class Messages extends React.Component {
     this.addTypingListeners(channelId);
   };
 
-  addTypingListerns = channelId => {
+  addTypingListeners = channelId => {
     let typingUsers = [];
     this.state.typingRef.child(channelId).on("child_added", snap => {
       if (snap.key !== this.state.user.uid) {
@@ -53,6 +53,7 @@ class Messages extends React.Component {
         this.setState({ typingUsers });
       }
     });
+
     this.state.typingRef.child(channelId).on("child_removed", snap => {
       const index = typingUsers.findIndex(user => user.id === snap.key);
       if (index !== -1) {
@@ -225,7 +226,7 @@ class Messages extends React.Component {
     }
   };
 
-  displayTypingUsers = typingUsers =>
+  displayTypingUsers = users =>
     users.length > 0 &&
     users.map(user => (
       <div
