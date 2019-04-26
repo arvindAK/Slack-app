@@ -115,7 +115,7 @@ class UserPanel extends React.Component {
       .child(this.state.user.uid)
       .update({ avatar: this.state.uploadedCroppedImage })
       .then(() => console.log("user Avatar updated"))
-      .catch(err => console.err(err));
+      .catch(err => console.error(err));
   };
 
   render() {

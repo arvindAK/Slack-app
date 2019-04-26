@@ -43,7 +43,7 @@ class MetaPanel extends React.Component {
     const { activeIndex, isPrivateChannel, channel } = this.state;
     const { userPosts } = this.props;
 
-    if (isPrivateChannel) return null;
+    if (isPrivateChannel || channel === null) return null;
     return (
       <Segment loading={!channel}>
         <Header as="h3" attached="top">

@@ -1,5 +1,5 @@
 import React from "react";
-import { Segment, Comment } from "semantic-ui-react";
+import { Segment, Comment, Header, Icon } from "semantic-ui-react";
 import MessagesHeader from "./MessagesHeader";
 import MessageForm from "./MessageForm";
 import firebase from "../../firebase";
@@ -279,14 +279,21 @@ class Messages extends React.Component {
       </div>
     ));
 
-  displayMessageSkeleton = loading =>
-    loading ? (
+  displayMessageSkeleton = (loading, messages) =>
+    loading && messages.length > 0 ? (
       <React.Fragment>
         {[...Array(10)].map((_, i) => (
           <Skeleton key={i} />
         ))}
       </React.Fragment>
-    ) : null;
+    ) : (
+      <React.Fragment>
+        <Header as="h3">
+          Try adding a channel or direct messaging a user!
+        </Header>
+        <Icon size="large" name="hand point left" />
+      </React.Fragment>
+    );
 
   render() {
     const {
@@ -317,7 +324,7 @@ class Messages extends React.Component {
 
         <Segment>
           <Comment.Group className="messages">
-            {this.displayMessageSkeleton(messagesLoading)}
+            {this.displayMessageSkeleton(messagesLoading, messages)}
             {searchTerm
               ? this.displayMessages(searchResults)
               : this.displayMessages(messages)}
