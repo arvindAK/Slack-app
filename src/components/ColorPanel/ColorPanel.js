@@ -21,12 +21,13 @@ class ColorPanel extends React.Component {
     primary: "",
     secondary: "",
     usersRef: firebase.database().ref("users"),
+    user: this.props.currentUser,
     userColors: []
   };
 
   componentDidMount() {
     if (this.props.currentUser) {
-      this.addListener(this.props.currentUser.uid);
+      this.addListener(this.state.user.uid);
     }
   }
 
